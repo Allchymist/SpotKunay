@@ -7,7 +7,7 @@ export default class Raw {
     this.type = 'raw';
   }
 
-  run(client: Client<true>, packet, x) {
-    client.Music.updateVoiceState(packet);
+  execute(client: Client<true>, packet, x) {
+    client.manager.updateVoiceState(packet);
   }
 }

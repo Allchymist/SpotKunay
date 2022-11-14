@@ -1,22 +1,19 @@
-import { Client } from "discord.js";
+import { Client, ClientEvents } from "discord.js";
 
-import { emoji } from '../../config.json';
+import { DeployCommand } from "../../commands/DeployCommands";
 
 export default class Ready {
-  type: string;
+  type: keyof ClientEvents;
 
   constructor() {
     this.type = 'ready';
   }
 
-  run(client: Client<true>) {
-    client.Music.init(client.user.id);
-    client.emote = emote;
+  async execute(client: Client<true>) {
+    client.manager.init(client.user.id);
 
-    console.log(`[EVENT READY] ${client.user.tag} is ready!`);
+    await DeployCommand(client);
 
-    function emote(name: keyof typeof emoji) {
-      return client.emojis.cache.get(emoji[name]);
-    }
+    console.log(`[CLIENT] ${client.user} is ready!`);
   }
 }
