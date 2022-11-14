@@ -25,7 +25,7 @@ export class SpotiKunay extends Client {
     const EventsFolder = readdirSync(resolve(__dirname, 'events/client'), 'utf-8');
     for (const EventsFile of EventsFolder) {
       const EventImport = await import(resolve(__dirname, 'events/client', EventsFile));
-      const Event = new EventImport();
+      const Event = new EventImport.default();
       
       if (Event && Event.type) {
         this.on(Event.type, Event.execute.bind(null, this));
@@ -57,7 +57,7 @@ export class SpotiKunay extends Client {
     const MusicFolder = readdirSync(resolve(__dirname, 'events/music'), 'utf-8');
     for (const MusicFile of MusicFolder) {
       const MusicImport = await import(resolve(__dirname, 'events/music', MusicFile));
-      const Music = new MusicImport();
+      const Music = new MusicImport.default();
 
       if (MusicFile && Music.type) {
         this.manager.on(Music.type, (...args) => Music.execute(this, ...args));
