@@ -1,103 +1,69 @@
-import { readdir, readdirSync } from 'fs';
-import Spotify from 'erela.js-spotify';
-import { Manager } from 'erela.js';
+import { Client, Collection } from 'discord.js';
+
+import { readdirSync } from 'fs';
 import { resolve } from 'path';
-import djs from 'discord.js';
 
-import { ClientOptions, emoji } from './config.json';
-import { CommandType } from './@types/CommandType';
+import { Manager } from 'erela.js';
+import Spotify from 'erela.js-spotify';
 
-export default class Client {
-  client: djs.Client<true>;
-  
+import { AppConfig } from './config/AppConfig';
+
+export class SpotiKunay extends Client {
   constructor() {
-    this.client = new djs.Client(ClientOptions as djs.ClientOptions); 
+    super(AppConfig);
 
-    this.client.SlashCommands = new djs.Collection();
-    this.client.Cooldowns = new djs.Collection();
-    this.Start();
+    this.Commands = new Collection();
+    this.Cooldowns = new Collection();
+
+    this.onReady();
   }
 
-  private async Start() {
-    await this.client.login();
+  private async onReady() {
+    // BOT CONNECTION //
+    this.login();
 
-    await this.LoadEvents();
-    await this.LoadSlashCommands();
-
-    this.client.Music = this.LoadLavalink(this.client);
-  }
-
-  private async LoadEvents() {
-    const eventsDir = readdirSync(resolve(__dirname, 'events', 'client'));
-
-    for (const file of eventsDir) {
-      const Event = await (await import(resolve(__dirname, 'events', 'client', file)));
-      const event = new Event.default();
-
-      this.client.on(event.type, (...args) => event.run(this.client, ...args));
-    }
-
-    console.log(`Loaded ${eventsDir.length} events.`);
-  }
-
-  private async LoadSlashCommands() {
-    const commandsDir = readdirSync(resolve(__dirname, 'commands', 'slash'));
-
-    for (const dir of commandsDir) {
-      const files = readdirSync(resolve(__dirname, 'commands', 'slash', dir));
-
-      for (const file of files) {
-        const Command = await (await import(resolve(__dirname, 'commands', 'slash', dir, file)));
-        const cmd: CommandType = new Command.default();
-
-        if (!cmd.data) continue;
-
-        this.client.SlashCommands.set(cmd.data.name, cmd);
+    const EventsFolder = readdirSync(resolve(__dirname, 'events/client'), 'utf-8');
+    for (const EventsFile of EventsFolder) {
+      const EventImport = await import(resolve(__dirname, 'events/client', EventsFile));
+      const Event = new EventImport();
+      
+      if (Event && Event.type) {
+        this.on(Event.type, Event.execute.bind(null, this));
       }
     }
 
-    this.client.guilds.cache.forEach((guild) => 
-      guild.commands.set(this.client.SlashCommands.map(({ data}) => data))
-    );
+    console.log('[CLIENT] Events On Ready!');
 
-    console.log(`Loaded ${this.client.SlashCommands.size} slash commands.`);
-  }
-
-  private LoadLavalink(client: djs.Client<true>) {
-    const manager = new Manager({
+    // ERELA CONNECTION //
+    this.manager = new Manager({
       plugins: [
         new Spotify({
-          clientID: process.env.SPOTIFYID,
-          clientSecret: process.env.SPOTIFYSECRET
-        })
+          clientID: process.env.S_CLIENT_ID,
+          clientSecret: process.env.S_CLIENT_SECRET,
+        }),
       ],
-      nodes: [
-        {
-          identifier: 'SpotiKunay',
-          host: process.env.HOST,
-          port: Number(process.env.PORT),
-          password: process.env.PASSWORD,
-        }
-      ],
-      send(id, payload) {
-        const guild = client.guilds.cache.get(id);
+      nodes: [{
+        identifier: 'SpotiKunay (NODE PRIVADO)',
+        host: process.env.HOST,
+        port: Number(process.env.PORT),
+        password: process.env.PASSWORD,
+      }],
+      send: (id, payload) => {
+        const guild = this.guilds.cache.get(id);
         if (guild) guild.shard.send(payload);
-      }
+      },
     });
 
-    readdir(resolve(__dirname, 'events', 'music'), async function (err, eventsDir) {
-      if (err) return;
+    const MusicFolder = readdirSync(resolve(__dirname, 'events/music'), 'utf-8');
+    for (const MusicFile of MusicFolder) {
+      const MusicImport = await import(resolve(__dirname, 'events/music', MusicFile));
+      const Music = new MusicImport();
 
-      for (const file of eventsDir) {
-        const Event = await (await import(resolve(__dirname, 'events', 'music', file)));
-        const event = new Event.default();
-
-        manager.on(event.type, (...args) => event.run(client, ...args));
+      if (MusicFile && Music.type) {
+        this.manager.on(Music.type, (...args) => Music.execute(this, ...args));
       }
-    });
+    }
 
-    console.log('Loaded Lavalink/Erela.');
-    return manager;
+    console.log('[CLIENT] Lavalink Starting...');
   }
-
 }

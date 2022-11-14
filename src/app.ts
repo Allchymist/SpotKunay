@@ -1,8 +1,10 @@
-import Client from "./client";
 import 'dotenv/config';
-new Client();
 
-process.on('unhandledRejection', (reason, promise) => {
-  const { message } = reason as Error;
-  console.error(message);
-});
+import { SpotiKunay } from "./client";
+
+new SpotiKunay();
+
+process.on('uncaughtExceptionMonitor', (err, origin) => console.error(err, origin));
+process.on('unhandledRejection', (reason, promise) => console.error(reason, promise));
+
+console.log('[CLIENT] Bot is Starting...');
