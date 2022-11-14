@@ -8,7 +8,7 @@ export default class PlayerMove {
     this.type = 'playerMove'; 
   }
 
-  run(client: Client<true>, player: Player, oldChannel: string, newChannel: string) {
+  execute(client: Client<true>, player: Player, oldChannel: string, newChannel: string) {
     if (!newChannel) return player.destroy();
     player.textChannel = newChannel;
 
@@ -18,4 +18,4 @@ export default class PlayerMove {
       setTimeout(() => player.pause(false), client.ws.ping * 2)
     }, client.ws.ping * 2);
   }
- }
+}

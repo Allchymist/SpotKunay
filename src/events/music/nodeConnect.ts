@@ -8,7 +8,7 @@ export default class NodeConnect {
     this.type = 'nodeConnect'; 
   }
 
-  run(client: Client<true>, node: Node) {
-    console.log(`[LAVALINK] ${node.options.identifier} | Conectado.`);
+  execute(client: Client<true>, node: Node) {
+    console.log(`[LAVALINK] ${node.options.identifier} | Connected`);
   }
- }
+}

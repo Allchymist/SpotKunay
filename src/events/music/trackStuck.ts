@@ -8,8 +8,10 @@ export default class TrackStuck {
     this.type = 'trackStuck'; 
   }
 
-  run(client: Client<true>, player: Player, track: Track, payload: Payload) {
+  execute(client: Client<true>, player: Player, track: Track, payload: Payload) {
     const channel = client.channels.cache.get(player.textChannel) as TextChannel;
-    channel?.send(`${client.emote('n')} **${track.title}** falhou ao ser carregado.`);
+    channel?.send(`**${track.title}** falhou ao ser carregado.`);
+
+    return player.messageId = null;
   }
- }
+}

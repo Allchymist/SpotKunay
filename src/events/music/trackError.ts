@@ -8,8 +8,10 @@ export default class TrackError {
     this.type = 'trackError'; 
   }
 
-  run(client: Client<true>, player: Player, track: Track, payload: Payload) {
+  execute(client: Client<true>, player: Player, track: Track, payload: Payload) {
     const channel = client.channels.cache.get(player.textChannel) as TextChannel;
-    channel?.send(`${client.emote('n')} **${track.title}** falhou ao ser carregado.`);
+    channel?.send(`**${track.title}** falhou ao ser carregado.`);
+  
+    return player.messageId = null;
   }
- }
+}

@@ -8,14 +8,14 @@ export default class QueueEnd {
     this.type = 'queueEnd'; 
   }
 
-  run(client: Client<true>, player: Player) {
-    if (player.queue.current) return;
-
+  execute(client: Client<true>, player: Player) {
     setTimeout(() => {
-      const channel = client.channels.cache.get(player.textChannel) as TextChannel;
-      channel?.send(`${client.emote('n')} Fim da fila, adiquira o **Premium** para usar o bot 24/7.`);
+      if (player.queue.current) return;
 
-      player.destroy();
+      const channel = client.channels.cache.get(player.textChannel) as TextChannel;
+      channel?.send(`Fim da fila, adquira o **Premium** para usar o bot 24/7.`);
+
+      return player.destroy();
     }, 1000 * 60);
   }
- }
+}

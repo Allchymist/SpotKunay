@@ -8,10 +8,7 @@ export default class NodeDisconnect {
     this.type = 'nodeDisconnect'; 
   }
 
-  run(client: Client<true>, node: Node) {
-    console.log(`[LAVALINK] ${node.options.identifier} | Desconectado.`);
-    console.log(`[LAVALINK] ${node.options.identifier} | Reiniciando...`);
-
-    return node.connect();
+  execute(client: Client<true>, node: Node) {
+    console.log(`[LAVALINK] ${node.options.identifier} | Disconnected`);
   }
- }
+}
