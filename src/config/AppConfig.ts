@@ -1,20 +1,19 @@
-import { ClientOptions } from "discord.js";
+import { ClientOptions, Partials } from "discord.js";
 
 export const AppConfig: ClientOptions = {
   intents: [
-    "GUILDS",
-    "GUILD_EMOJIS_AND_STICKERS",
-    "GUILD_MEMBERS",
-    "GUILD_MESSAGES",
-    "GUILD_MESSAGE_REACTIONS",
-    "GUILD_VOICE_STATES",
-    "MESSAGE_CONTENT"
+    "GuildEmojisAndStickers",
+    "GuildMembers",
+    "GuildMessageReactions",
+    "GuildMessages",
+    "Guilds",
+    "MessageContent"
   ],
   partials: [
-    "CHANNEL",
-    "GUILD_MEMBER",
-    "MESSAGE",
-    "REACTION",
-    "USER"
+    Partials.Channel,
+    Partials.GuildMember,
+    Partials.Message,
+    Partials.Reaction,
+    Partials.User
   ]
 }
