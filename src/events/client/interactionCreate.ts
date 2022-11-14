@@ -42,8 +42,6 @@ export default class InteractionCreate {
         console.error(message);
         
         return interaction.editReply(`Ocorreu um erro ao executar este comando.`)
-      } finally {
-
       }
     }
   }
