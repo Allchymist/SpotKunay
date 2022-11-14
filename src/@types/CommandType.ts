@@ -1,14 +1,10 @@
-import { ApplicationCommandDataResolvable, CommandInteraction, PermissionString } from 'discord.js';
+import { ApplicationCommandData, CommandInteraction, Client } from 'discord.js';
 
 export type CommandType = {
-  data: ApplicationCommandDataResolvable;
-
-  bot_perm: PermissionString[];
-  user_perm: PermissionString[];
-  dj_perm: boolean;
-
+  data: ApplicationCommandData;
+  ephemeral: boolean;
   cooldown: number;
-  inVoiceChannel: boolean;
+  inVoiceChannel?: boolean;
 
-  run(int: CommandInteraction): any | Promise<any>;
+  execute(client: Client, int: CommandInteraction): any | Promise<any>;
 }
