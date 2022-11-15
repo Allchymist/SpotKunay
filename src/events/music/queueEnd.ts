@@ -9,6 +9,8 @@ export default class QueueEnd {
   }
 
   execute(client: Client<true>, player: Player) {
+    player.messageId = null;
+
     setTimeout(() => {
       if (player.queue.current) return;
 

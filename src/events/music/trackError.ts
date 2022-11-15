@@ -11,6 +11,8 @@ export default class TrackError {
   execute(client: Client<true>, player: Player, track: Track, payload: Payload) {
     const channel = client.channels.cache.get(player.textChannel) as TextChannel;
     channel?.send(`**${track.title}** falhou ao ser carregado.`);
+
+    player.stop();
   
     return player.messageId = null;
   }

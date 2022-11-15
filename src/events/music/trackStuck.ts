@@ -12,6 +12,8 @@ export default class TrackStuck {
     const channel = client.channels.cache.get(player.textChannel) as TextChannel;
     channel?.send(`**${track.title}** falhou ao ser carregado.`);
 
+    player.stop();
+
     return player.messageId = null;
   }
 }
