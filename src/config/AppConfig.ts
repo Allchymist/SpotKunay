@@ -7,7 +7,8 @@ export const AppConfig: ClientOptions = {
     "GuildMessageReactions",
     "GuildMessages",
     "Guilds",
-    "MessageContent"
+    "MessageContent",
+    "GuildVoiceStates"
   ],
   partials: [
     Partials.Channel,
