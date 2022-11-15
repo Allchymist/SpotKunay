@@ -40,17 +40,18 @@ export default class Play {
         guild: interaction.guildId,
         textChannel: interaction.channelId,
         voiceChannel: target.voice.channelId,
-        messageId: msg.id,
         selfDeafen: true,
       });
-    } else player.messageId = msg.id;
+    } 
+    
+    player.messageId = msg.id;
 
     try {
       const search = await player.search(title, interaction.user);
       if (player.state !== 'CONNECTED') await player.connect();
 
       if (search.loadType === 'PLAYLIST_LOADED') {
-        search.tracks.forEach((track) => player.queue.add(track));
+        player.queue.concat(search.tracks);
 
         const { playlist } = search;
         const select = playlist.selectedTrack;
@@ -65,9 +66,7 @@ export default class Play {
             color: 0x00FF00,
             thumbnail: { url: select?.thumbnail || '' },
             author: { name: 'Adicionado a fila!', icon_url: interaction.user.displayAvatarURL() },
-            description: `[${playlist.name}](${select.uri})\n\n` +
-              `Canal: _\`${select.author}\`_\nDuração: _\`${totalTime}\`_\n` +
-              `Quantidade: ${search.tracks.length} músicas`
+            description: `${playlist.name}\n\nDuração: _\`${totalTime}\`_\nQuantidade: ${search.tracks.length} músicas`
           }]
         });
       } else {
@@ -84,7 +83,7 @@ export default class Play {
             color: 0x00FF00,
             thumbnail: { url: track.thumbnail || '' },
             author: { name: 'Adicionado a fila!', icon_url: interaction.user.displayAvatarURL() },
-            description: `[${track.title}](${title})\n\n` +
+            description: `[${track.title}](${track.uri})\n\n` +
               `Canal: _\`${track.author}\`_\nDuração: _\`${time}\`_\n` +
               `Posição: ${player.queue.size}º na Fila`
           }]
