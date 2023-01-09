@@ -23,22 +23,19 @@ export async function DeployCommand(client: Client) {
 
   console.log('[CLIENT] Commands file Loaded on Collection');
 
+  const data = client.Commands.map(({ data }) => data);
+
+  // await client.guilds.cache.get('1040725831259009034').commands.set([]);
+
   const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
 
   try {
     console.log(`[CLIENT] Loading ${client.Commands.size} Commands`);
 
-    const data = client.Commands.map(({ data }) => data);
-
-    if (process.env.MODE_APP == 'DEV') {
-      const GuildDev = client.guilds.cache.get("1040725831259009034");
-      await GuildDev.commands.set(data);
-    } else {
-      await rest.put(
-        Routes.applicationCommands(client.user.id),
-        { body: data }
-      ) as any;
-    }
+    await rest.put(
+      Routes.applicationCommands(client.user.id),
+      { body: [] }
+    ) as any;
 
     console.log(`[CLIENT] ${data.length} Commands Loaded`)
   } catch (err) {
