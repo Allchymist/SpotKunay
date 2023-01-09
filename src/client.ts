@@ -7,6 +7,7 @@ import { Manager } from 'erela.js';
 import Spotify from 'erela.js-spotify';
 
 import { AppConfig } from './config/AppConfig';
+import { Database } from './database';
 
 export class SpotiKunay extends Client {
   constructor() {
@@ -14,6 +15,7 @@ export class SpotiKunay extends Client {
 
     this.Commands = new Collection();
     this.Cooldowns = new Collection();
+    this.Database = new Database();
 
     this.onReady();
   }
