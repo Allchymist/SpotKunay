@@ -10,7 +10,7 @@ export default class PlayerMove {
 
   execute(client: Client<true>, player: Player, oldChannel: string, newChannel: string) {
     if (!newChannel) return player.destroy();
-    player.textChannel = newChannel;
+    player.voiceChannel = newChannel;
 
     if (player.paused) return;
     setTimeout(() => {

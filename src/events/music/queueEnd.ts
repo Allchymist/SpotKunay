@@ -9,10 +9,10 @@ export default class QueueEnd {
   }
 
   execute(client: Client<true>, player: Player) {
-    player.messageId = null;
+    if (player.queue.current) return;
 
     setTimeout(() => {
-      if (player.queue.current) return;
+      if (player.playing) return;
 
       const channel = client.channels.cache.get(player.textChannel) as TextChannel;
       channel?.send(`Fim da fila, adquira o **Premium** para usar o bot 24/7.`);

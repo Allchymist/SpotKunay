@@ -13,7 +13,5 @@ export default class TrackStuck {
     channel?.send(`**${track.title}** falhou ao ser carregado.`);
 
     player.stop();
-
-    return player.messageId = null;
   }
 }
