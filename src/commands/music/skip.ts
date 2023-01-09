@@ -23,7 +23,6 @@ export default class Skip {
 
     player.stop();
   
-    const msg = await interaction.editReply('pulando música...');
-    return await msg.react('⏭')
+    return interaction.editReply('pulando música...');
   }
 }

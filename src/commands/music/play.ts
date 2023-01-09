@@ -1,4 +1,10 @@
-import { ApplicationCommandData, ApplicationCommandOptionType, ChatInputCommandInteraction, Client, GuildMember } from "discord.js";
+import {
+  ApplicationCommandData,
+  ApplicationCommandOptionType,
+  ChatInputCommandInteraction,
+  AutocompleteInteraction,
+  Client, GuildMember,
+} from "discord.js";
 
 import moment from "moment";
 import 'moment-duration-format';
@@ -16,7 +22,8 @@ export default class Play {
         name: 'title',
         description: 'Título ou link(URL) da música',
         type: ApplicationCommandOptionType.String,
-        required: true
+        autocomplete: true,
+        required: true,
       }]
     }
 
@@ -26,12 +33,6 @@ export default class Play {
 
   async execute(client: Client, interaction: ChatInputCommandInteraction) {
     const title = interaction.options.getString('title');
-    const msg = await interaction.editReply({
-      embeds: [{
-        description: `Procurando... \`${title}\``
-      }]
-    });
-
     const target = interaction.member as GuildMember;
 
     let player = client.manager.get(interaction.guildId);
@@ -42,50 +43,47 @@ export default class Play {
         voiceChannel: target.voice.channelId,
         selfDeafen: true,
       });
-    } 
-    
-    player.messageId = msg.id;
+    }
 
     try {
       const search = await player.search(title, interaction.user);
       if (player.state !== 'CONNECTED') await player.connect();
 
       if (search.loadType === 'PLAYLIST_LOADED') {
-        player.queue.concat(search.tracks);
+        search.tracks.forEach((track) => player.queue.add(track));
+      
+        console.log(player.queue.size);
 
         const { playlist } = search;
         const select = playlist.selectedTrack;
         const totalTime = moment.duration(playlist.duration, "milliseconds").format('hh:mm:ss');
 
-        if (!player.playing && !player.paused && !player.queue.size) {
-          return player.play();
-        }
+        if (!player.playing && !player.paused && !player.queue.size) await player.play();
 
         return interaction.editReply({
           embeds: [{
             color: 0x00FF00,
-            thumbnail: { url: select?.thumbnail || '' },
+            thumbnail: { url: select?.thumbnail || interaction.guild.iconURL() },
             author: { name: 'Adicionado a fila!', icon_url: interaction.user.displayAvatarURL() },
-            description: `${playlist.name}\n\nDuração: _\`${totalTime}\`_\nQuantidade: ${search.tracks.length} músicas`
+            description: `Nome: _\`${playlist?.name || 'Playlist Desconhecida'}\`_\n\nDuração: _\`${totalTime}\`_\nQuantidade: ${search.tracks.length} músicas`
           }]
         });
       } else {
         const track = search.tracks[0];
-        player.queue.add(track);
+
+        if (!player.playing && !player.paused && !player.queue.size) await player.play(track);
+        else player.queue.add(track);
 
         const time = moment.duration(track.duration, "milliseconds").format('hh:mm:ss');
-        if (!player.playing && !player.paused && !player.queue.size) {
-          return player.play();
-        }
 
         return interaction.editReply({
           embeds: [{
             color: 0x00FF00,
-            thumbnail: { url: track.thumbnail || '' },
+            thumbnail: { url: track.thumbnail || interaction.guild.iconURL() },
             author: { name: 'Adicionado a fila!', icon_url: interaction.user.displayAvatarURL() },
             description: `[${track.title}](${track.uri})\n\n` +
               `Canal: _\`${track.author}\`_\nDuração: _\`${time}\`_\n` +
-              `Posição: ${player.queue.size}º na Fila`
+              `Posição: _\`${player.queue.size}º na Fila\`_`
           }]
         });
       }
@@ -94,9 +92,25 @@ export default class Play {
 
       return interaction.editReply({
         embeds: [{
-          description: 'Ocorreu um erro ao reproduzir a música.'
+          title: 'Ocorreu um erro ao reproduzir a música.',
+          description: err.message
         }]
       });
     }
+  }
+
+  async autoComplete(client: Client, interaction: AutocompleteInteraction) {
+    const focusedValue = interaction.options.getFocused();
+    const search = await client.manager.search(focusedValue);
+
+    const tracks = search.tracks.slice(0, 25)
+    .filter(({ title }) => title.includes(focusedValue))
+    .map(({ title, uri}) => {
+      const name = title.length >= 50 ? title.substring(0, 50).padEnd(53, ".") : title
+
+      return { name, value: uri };
+    });
+
+    return await interaction.respond(tracks);
   }
 }
