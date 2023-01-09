@@ -14,8 +14,7 @@
   ],
   "scripts": {
     "start": "node .",
-    "clean": "rimraf ./build",
-    "build": "npm run clean && tsc --project ./tsconfig.json",
+    "build": "tsc --project ./tsconfig.json",
     "dev": "ts-node-dev --respawn --poll --transpile-only --ignore-watch ./node_modules ./src/app.ts"
   },
   "devDependencies": {
